@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gif animados</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        /* mis estilos */
+    </style>
+    <!--Scripts-->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <script>
+
+        function truncate(str, n, useWordBoundary) {
+            if (str.length <= n) { return str; }
+            const subString = str.substr(0, n - 1); // the original check
+            return (useWordBoundary
+                ? subString.substr(0, subString.lastIndexOf(" "))
+                : subString) + "&hellip;";
+        };
+        function getRandomInt(min=1, max=100) {
+                return Math.floor(Math.random() * (max - min)) + min;
+            }
+
+
+        $(document).ready(function () {
+            // $("#formulario div button").on("click", function () {
+            $("#formulario form").submit(function(){
+                $("#resultado .row").empty();
+                // console.log("Prueba");
+                // let busqueda= $("#busqueda").val();
+                // console.log(busqueda);
+                //la api funciona asi
+                //el ? separa : de ahi para atras la dir de la pagina y de ahi para adelante la busqueda
+                //api.giphy.com/v1/gifs/search?api_key=lamia&q=LOQUEYOQUIERO muchos
+                //api.giphy.com/v1/gifs/search?api_key=lamia&limit=2&q=LOQUEYOQUIERO Solo2
+                //https://api.giphy.com/v1/gifs/search?api_key=Pr7Rv26TtnJsGAs5gvVtxf0YM3S9pJM1&limit=3&q=naruto
+                let busqueda = $("#busqueda").val();
+                let cantidad = $("#cantidad").val();
+                let aleatorio = getRandomInt(1,100);
+                let urlapi = `https://api.giphy.com/v1/gifs/search?offset=${aleatorio}&api_key=Pr7Rv26TtnJsGAs5gvVtxf0YM3S9pJM1&limit=${cantidad}&q=${busqueda}`;
+
+
+                $.get(urlapi, function (respuesta) {
+                    // console.log(respuesta.data[0].images.fixed_height.url);
+                    // console.log(respuesta.data[1].images.fixed_height.url);
+                    // console.log(respuesta.data[2].images.fixed_height.url);
+                    //lo mismo que el for de abajo
+
+                    for (const gif of respuesta.data) {
+                        console.log(gif.images.fixed_height.url); //entrega los objetos, pero quiero el img fixed.url
+
+                        let description = "No existe."
+                        if (gif.user != undefined) {
+                            description = truncate(gif.user.description, 120, true);
+                        }
+
+
+                        let imgHtml = `
+                            <div class="col-6">
+                                <div class="card">
+                                    <img src="${gif.images.fixed_height.url}" class="card-img-top" alt="...">
+                                    <div class="card-body">
+                                        <h5 class"card-title">${gif.title}</h5>
+                                        <p class="card-text">
+                                            ${description}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            `;
+
+                        $("#resultado .row").append(imgHtml);
+                    }
+                })
+                return false
+            })
+
+        })
+
+    </script>
+</head>
+
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div id="formulario" class="col">
+                <h3>Formulario</h3>
+                <hr>
+                <form action="">
+                    <div class="mb-3 row">
+                        <label for="busqueda" class="col-sm-2 col-form-label mx-2">Buscar:</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="busqueda">
+                        </div>
+                        <label for="busqueda" class="col-sm-2 col-form-label mx-2">Cantidad</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="cantidad">
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button class="btn btn-primary" type="submit">Button</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="resultado" class="col-sm-12 col-md-6 col-lg-9 ">
+                <h3>Resultado</h3>
+                <hr>
+                <div class="row">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <!--Esto es de Bootstrap-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
